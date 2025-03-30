@@ -10,24 +10,40 @@ require() {
 require fd
 require egrep
 
+# Use the provided directory or default to the current directory
+TARGET_DIR="${1:-$PWD}"
+
 declare -A special_cases=(
     ['^*.(tar.*|tbz)$']='tar'
-    # TODO: Add your own pattern here for similar file types appropriately
-    # Refer https://regex101.com/ & https://github.com/ziishaned/learn-regex/ for explaination and writing patterns
-    # These (regex) are same as ones used in sed command
+    ['^*.(zip|rar|7z|gz|bz2|xz)$']='archives'
+    ['^*.(jpg|jpeg|png|gif|bmp|webp|svg)$']='images'
+    ['^*.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt|md|odt|ods|odp)$']='documents'
+    ['^*.(mp3|wav|flac|m4a|ogg|wma)$']='audio'
+    ['^*.(mp4|avi|mkv|mov|wmv|flv|webm)$']='video'
+    ['^*.(py|js|java|c|cpp|h|cs|php|html|css|sh|bash|json|xml)$']='code'
+    ['^*.(ttf|otf|woff|woff2|eot)$']='fonts'
+    ['^*.(sql|sqlite|db)$']='databases'
+    ['^*.(exe|msi|app|dmg|deb|rpm)$']='executables'
+    ['^*.(log|txt)$']='logs'
+    ['^*.(conf|config|ini|yaml|yml|json|xml)$']='config'
 )
 
-fd -tf -d1 \
+# Main processing
+echo "Organising files into the respective folders"
+
+# Process each file in the target directory
+fd -tf -d1 "$TARGET_DIR" \
 | while read file; do
-    folder="$PWD/${file##*.}"
+    extension="${file##*.}"
+    folder="$TARGET_DIR/$extension"
     for regex in "${!special_cases[@]}"; do
         (echo "$file" | egrep -q "$regex") && {
-            folder="$PWD/${special_cases[$regex]}"
+            folder="$TARGET_DIR/${special_cases[$regex]}"
             break
         }
     done
-
     mkdir -p "$folder"
     mv "$file" "$folder"
 done
 
+echo "File organization complete!" 
