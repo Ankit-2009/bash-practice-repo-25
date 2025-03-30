@@ -2,3 +2,13 @@
 
 # Extract the wifi username (SSID)
 # Refer: "iw dev wlan0 link" command output for this
+
+# Use Windows netsh command
+ssid=$(/mnt/c/Windows/System32/netsh.exe wlan show interfaces | grep "SSID" | grep -v "BSSID" | cut -d ":" -f 2 | tr -d " \r")
+
+if [ -z "$ssid" ]; then
+    echo "Error: No SSID found or not connected to any network"
+    exit 1
+fi
+
+echo "$ssid"
