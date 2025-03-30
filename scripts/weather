@@ -2,3 +2,6 @@
 
 # TODO: Display weather of IIIT, Lucknow
 # For more information see: https://wttr.in/:help
+
+echo "Fetching weather information for IIIT, Lucknow..."
+curl -s "wttr.in/IIIT+Lucknow?format=3" | cat
