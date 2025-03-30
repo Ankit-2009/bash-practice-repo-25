@@ -2,3 +2,12 @@
 
 # Remove all the binary files (usually made after gcc) present inside current directory
 # Refer "man find" for more information, you can also use modern tool like fd instead of find
+echo "Searching binary files"
+fd --type f --exec sh -c '
+    for file do
+        if file "$file" | grep -q "ELF.*executable\|ELF.*shared object\|ELF.*relocatable"; then
+            echo "Removing GCC-generated binary: $file"
+            rm -f "$file"
+        fi
+    done' sh {} +
+echo "Deleted all bniary files!"
